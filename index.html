@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>GOLD · XAU Terminal</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d1117'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%23eab308' stroke-width='4'/%3E%3Ctext x='32' y='38' font-family='monospace' font-size='20' font-weight='bold' fill='%23eab308' text-anchor='middle'%3EAU%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Top Sticky Header -->
+    <header class="top-bar">
+      <div class="header-top">
+        <div class="symbol-group">
+          <span class="symbol-title">GOLD · XAU</span>
+          <span id="live-price" class="live-price">--</span>
+          <span id="live-change" class="live-change">--</span>
+        </div>
+        <div class="header-actions">
+          <button id="btn-alarm-settings" class="icon-btn" aria-label="Alert Settings" title="Alert Settings">⚙️</button>
+          <button id="btn-test-alarm" class="chip-btn" aria-label="Test Alarm">🔔 Test</button>
+        </div>
+      </div>
+      <div class="header-meta">
+        <div class="badges">
+          <span id="badge-iv" class="badge badge-neutral">ATM IV: --</span>
+          <span id="badge-bias" class="badge badge-neutral">NEUTRAL</span>
+          <span id="badge-ws" class="badge badge-dim">WS: …</span>
+        </div>
+        <div id="analysis-timestamp" class="timestamp">Loading analysis…</div>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Viewport -->
+    <main class="viewport">
+      <!-- PAGE 1: LEVELS -->
+      <section id="page-levels" class="tab-page active" aria-label="Levels">
+        <div class="card">
+          <div class="card-header">
+            <h2>OPTIONS LEVELS</h2>
+            <label class="switch-label">
+              <input type="checkbox" id="toggle-global-alert" />
+              <span>Alert all zones</span>
+            </label>
+          </div>
+          <div id="levels-unavailable" class="empty-state hidden">data unavailable</div>
+          <div id="levels-list" class="levels-list">
+            <!-- R3..R1, Gamma Flip, S1..S3 injected here -->
+          </div>
+        </div>
+
+        <div class="card" id="signal-card">
+          <div class="card-header">
+            <h2>ACTIVE SIGNAL (<span id="signal-tf-label">15m</span>)</h2>
+            <span id="signal-regime-pill" class="badge badge-neutral">--</span>
+          </div>
+          <div id="signal-body" class="signal-body">
+            <div class="signal-neutral">Waiting for candle data…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 2: RANGE & CHART -->
+      <section id="page-chart" class="tab-page" aria-label="Range and Chart">
+        <!-- a) Expected Range Panel -->
+        <div class="card">
+          <div class="card-header">
+            <h2>EXPECTED RANGE</h2>
+            <span id="range-iv-label" class="mono-dim">IV --</span>
+          </div>
+          <div id="range-unavailable" class="empty-state hidden">data unavailable</div>
+          <div id="range-content">
+            <div class="range-grid">
+              <div class="range-box">
+                <div class="range-label">DAILY 1σ (68%)</div>
+                <div id="d1-bounds" class="range-val">-- / --</div>
+              </div>
+              <div class="range-box">
+                <div class="range-label">DAILY 2σ (95%)</div>
+                <div id="d2-bounds" class="range-val">-- / --</div>
+              </div>
+              <div class="range-box">
+                <div class="range-label">WEEKLY 1σ (68%)</div>
+                <div id="w1-bounds" class="range-val">-- / --</div>
+              </div>
+              <div class="range-box">
+                <div class="range-label">WEEKLY 2σ (95%)</div>
+                <div id="w2-bounds" class="range-val">-- / --</div>
+              </div>
+            </div>
+            <div class="range-bar-wrap">
+              <div class="range-bar-labels">
+                <span id="bar-low">--</span>
+                <span>DAILY 1σ POSITION</span>
+                <span id="bar-high">--</span>
+              </div>
+              <div class="range-bar-track">
+                <div id="range-bar-fill" class="range-bar-fill"></div>
+                <div id="range-bar-pin" class="range-bar-pin"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- b) Live Chart -->
+        <div class="card chart-card">
+          <div class="chart-toolbar">
+            <div class="tf-group" role="group" aria-label="Timeframe">
+              <button class="tf-btn" data-tf="5m">5m</button>
+              <button class="tf-btn active" data-tf="15m">15m</button>
+              <button class="tf-btn" data-tf="1h">1h</button>
+            </div>
+            <div class="chart-tools">
+              <button id="btn-toggle-range-band" class="tool-btn active">1σ/2σ Band</button>
+              <button id="btn-open-indicators" class="tool-btn">Indicators</button>
+            </div>
+          </div>
+          <div id="chart-container" class="chart-container"></div>
+          <div id="chart-error" class="empty-state hidden">data unavailable</div>
+        </div>
+
+        <!-- c) GEX by Strike -->
+        <div class="card" id="gex-card">
+          <div class="card-header">
+            <h2>NET GEX BY STRIKE (±5%)</h2>
+            <span class="mono-dim">Tap bar for detail</span>
+          </div>
+          <div id="gex-tooltip" class="gex-tooltip hidden"></div>
+          <div id="gex-chart-wrap" class="gex-chart-wrap">
+            <svg id="gex-svg" class="gex-svg" preserveAspectRatio="none"></svg>
+          </div>
+        </div>
+      </section>
+
+      <footer class="app-footer">
+        Educational tool, not financial advice. Signals are rule-based and not guaranteed.
+      </footer>
+    </main>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="bottom-nav" aria-label="Primary Navigation">
+      <button class="nav-btn active" data-tab="page-levels">
+        <span class="nav-icon">📊</span>
+        <span class="nav-text">LEVELS</span>
+      </button>
+      <button class="nav-btn" data-tab="page-chart">
+        <span class="nav-icon">📈</span>
+        <span class="nav-text">RANGE &amp; CHART</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- INDICATORS BOTTOM SHEET -->
+  <div id="modal-indicators" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="ind-title">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 id="ind-title">Indicators &amp; Overlays</h3>
+        <button class="close-btn" data-close="modal-indicators">✕</button>
+      </div>
+      <input type="search" id="ind-search" class="sheet-search" placeholder="Search overlays…" />
+      <div class="sheet-tabs" id="ind-cats">
+        <button class="cat-btn active" data-cat="all">All</button>
+        <button class="cat-btn" data-cat="options">Options</button>
+        <button class="cat-btn" data-cat="structure">Structure</button>
+        <button class="cat-btn" data-cat="alerts">Signals</button>
+      </div>
+      <div id="ind-list" class="sheet-list"></div>
+    </div>
+  </div>
+
+  <!-- ALERT SETTINGS BOTTOM SHEET -->
+  <div id="modal-settings" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="set-title">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 id="set-title">Alert Settings</h3>
+        <button class="close-btn" data-close="modal-settings">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="setting-row">
+          <label for="set-sensitivity">Proximity Sensitivity</label>
+          <select id="set-sensitivity" class="sheet-select">
+            <option value="0.0005">0.05%</option>
+            <option value="0.001" selected>0.10% (Default)</option>
+            <option value="0.002">0.20%</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label for="set-cooldown">Alert Cooldown (minutes)</label>
+          <select id="set-cooldown" class="sheet-select">
+            <option value="5">5 min</option>
+            <option value="15">15 min</option>
+            <option value="30" selected>30 min (Default)</option>
+            <option value="60">60 min</option>
+          </select>
+        </div>
+        <div class="setting-note">
+          Screen Wake Lock activates automatically while any level or global alert is armed. Tap "🔔 Test" in the header once to unlock mobile audio.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL-SCREEN ALARM OVERLAY -->
+  <div id="alarm-overlay" class="alarm-overlay hidden" role="alertdialog" aria-modal="true">
+    <div class="alarm-content">
+      <div class="alarm-pulse">🔔</div>
+      <div id="alarm-title" class="alarm-title">BUY ZONE TOUCHED — GOLD 0.00</div>
+      <div id="alarm-sub" class="alarm-sub">Level R1 · Distance 0.02%</div>
+      <div class="alarm-actions">
+        <button id="btn-alarm-snooze" class="alarm-btn snooze">Snooze 5 min</button>
+        <button id="btn-alarm-dismiss" class="alarm-btn dismiss">Dismiss</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
