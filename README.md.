@@ -1,0 +1,33 @@
+# GOLD · XAU Options Trading Terminal (PWA)
+
+Mobile-first, zero-dependency PWA trading terminal for Gold (`PAXGUSDT` / `XAU`) powered solely by GitHub Pages and GitHub Actions.
+
+## Setup Steps
+
+1. **Create a GitHub Repository**
+   - Push all files in this directory to the `main` branch of a new GitHub repository.
+
+2. **Enable GitHub Pages**
+   - Go to **Settings → Pages → Build and deployment → Source** and select **GitHub Actions**.
+
+3. **Add Push Notification Secret**
+   - Choose a private, hard-to-guess topic string (e.g., `gold-xau-alerts-984321`).
+   - Go to **Settings → Secrets and variables → Actions → New repository secret**.
+   - Name: `NTFY_TOPIC`
+   - Value: your private topic string.
+
+4. **Run Initial Analysis**
+   - Go to the **Actions** tab → **Daily Options Analysis & Deploy** → **Run workflow** (on `main`).
+   - This fetches live CBOE `GLD` options + `PAXGUSDT` spot, populates `data/analysis.json`, and deploys the site.
+
+5. **Configure Phone Alerts (ntfy)**
+   - Install the **ntfy** app on Android (or iOS).
+   - Subscribe to your exact `NTFY_TOPIC` string.
+   - Open Android App Info for **ntfy** → **Notifications** → enable **Override Do Not Disturb** and set importance to **Urgent / High**.
+   - *Note:* GitHub Actions `*/5 * * * *` cron schedules can occasionally be delayed by a few minutes during peak GitHub load.
+
+6. **Install as Mobile PWA**
+   - Open your GitHub Pages URL (`https://<username>.github.io/<repo>/`) in Chrome/Safari on your phone and tap **Add to Home Screen**.
+   - Tap **🔔 Test** once in the top bar to unlock Web Audio sirens when the app is open.
+
+> Educational tool, not financial advice. Signals are rule-based and not guaranteed.
