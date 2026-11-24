@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-11-24T14:33:00.000Z",
+  "generated_at_eat": "2026-11-24 17:33:00 EAT",
+  "spot_source": "seed:initial",
+  "spot": 2650.00,
+  "prev_close": 2642.00,
+  "gld_price": 244.50,
+  "gld_gold_ratio": 10.8384,
+  "resistances": [
+    { "price": 2665.00, "strength": 3, "type": "Call wall" },
+    { "price": 2680.00, "strength": 4, "type": "Call wall" },
+    { "price": 2700.00, "strength": 5, "type": "Call wall" }
+  ],
+  "supports": [
+    { "price": 2635.00, "strength": 3, "type": "Put wall" },
+    { "price": 2620.00, "strength": 4, "type": "Put wall" },
+    { "price": 2600.00, "strength": 5, "type": "Put wall" }
+  ],
+  "gamma_flip": {
+    "price": 2645.00,
+    "status": "active"
+  },
+  "expected_range": {
+    "atm_iv": 0.1650,
+    "nearest_expiry": "2026-11-27",
+    "daily_1s_low": 2619.18,
+    "daily_1s_high": 2664.82,
+    "daily_2s_low": 2596.36,
+    "daily_2s_high": 2687.64,
+    "weekly_1s_low": 2589.51,
+    "weekly_1s_high": 2710.49,
+    "weekly_2s_low": 2529.02,
+    "weekly_2s_high": 2770.98
+  },
+  "gex_by_strike": [
+    { "strike": 2600, "call_gex": 120000, "put_gex": -2400000, "net_gex": -2280000, "oi": 14200, "iv": 0.172 },
+    { "strike": 2620, "call_gex": 250000, "put_gex": -1850000, "net_gex": -1600000, "oi": 11500, "iv": 0.168 },
+    { "strike": 2635, "call_gex": 410000, "put_gex": -1250000, "net_gex": -840000, "oi": 8900, "iv": 0.166 },
+    { "strike": 2650, "call_gex": 980000, "put_gex": -910000, "net_gex": 70000, "oi": 13100, "iv": 0.165 },
+    { "strike": 2665, "call_gex": 1450000, "put_gex": -390000, "net_gex": 1060000, "oi": 9800, "iv": 0.164 },
+    { "strike": 2680, "call_gex": 2100000, "put_gex": -210000, "net_gex": 1890000, "oi": 12400, "iv": 0.166 },
+    { "strike": 2700, "call_gex": 3250000, "put_gex": -140000, "net_gex": 3110000, "oi": 18600, "iv": 0.170 }
+  ],
+  "bias": "BULLISH"
+}
